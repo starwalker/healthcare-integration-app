@@ -1,0 +1,13 @@
+server:
+  port: 8080
+
+app:
+  kafka:
+    bootstrapServers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    topic: ${APP_TOPIC:patient.events.v1}
+    consumerGroup: ${APP_CONSUMER_GROUP:health-consumer}
+
+spring:
+  kafka:
+    properties:
+      security.protocol: ${KAFKA_SECURITY_PROTOCOL:PLAINTEXT} # For MSK, prefer SASL_SSL with IAM or SCRAM

@@ -1,0 +1,24 @@
+replicaCount: 2
+
+image:
+  repository: ghcr.io/your-org/health-integration-service
+  tag: "0.1.0"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+env:
+  KAFKA_BOOTSTRAP_SERVERS: "b-1.msk.example:9092,b-2.msk.example:9092"
+  APP_TOPIC: "patient.events.v1"
+  APP_CONSUMER_GROUP: "health-consumer"
+  KAFKA_SECURITY_PROTOCOL: "SASL_SSL" # Prefer IAM or SCRAM
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "256Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"

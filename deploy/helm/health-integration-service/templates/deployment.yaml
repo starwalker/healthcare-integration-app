@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: health-integration-service
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: health-integration-service
+  template:
+    metadata:
+      labels:
+        app: health-integration-service
+    spec:
+      serviceAccountName: health-svc # bind to IRSA in EKS
+      containers:
+        - name: app
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          ports:
+            - containerPort: 8080
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "{{ .Values.env.KAFKA_BOOTSTRAP_SERVERS }}"
+            - name: APP_TOPIC
+              value: "{{ .Values.env.APP_TOPIC }}"
+            - name: APP_CONSUMER_GROUP
+              value: "{{ .Values.env.APP_CONSUMER_GROUP }}"
+            - name: KAFKA_SECURITY_PROTOCOL
+              value: "{{ .Values.env.KAFKA_SECURITY_PROTOCOL }}"
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 20
